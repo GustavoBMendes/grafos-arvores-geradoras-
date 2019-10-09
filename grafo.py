@@ -26,15 +26,17 @@ def adiciona_aresta(origem, destino):
         return False
 
 def busca_em_largura(vertice_inicio):
-    cor, dist, pai, fila, aresta, arvore = dict(), dict(), dict(), list(), dict(), dict()
+    cor, dist, pai, fila = dict(), dict(), dict(), list()
 
-    for v in grafo_nao_orientado.keys:
+    for v in grafo_nao_orientado.keys():
         cor[v] = 'BRANCO'
     
     fila.append(vertice_inicio)
     cor[vertice_inicio] = 'CINZA'
-    pred[vertice_inicio] = None
-    dist[vertice_inicio] = 1
+    pai[vertice_inicio] = None
+    dist[vertice_inicio] = 0
+
+    maior = vertice_inicio
 
     while len(fila):
         u = fila.pop(0)
@@ -43,8 +45,20 @@ def busca_em_largura(vertice_inicio):
             if cor.get(v) == 'BRANCO':
                 cor[v] = 'CINZA'
                 dist[v] = dist[u] + 1
-                pred[v] = u
+                pai[v] = u
                 fila.append(v)
+
+                if dist[v] >= dist[maior]:
+                    maior = v
+
         cor[u] = 'PRETO'
         
-    return cor, pred, aresta, dist, arvore
+    return maior
+
+def diametro(vertice):
+    a = busca_em_largura(vertice)
+    b = busca_em_largura(a)
+
+def print_grafo():
+    for v in grafo_nao_orientado.keys():
+        print(v)
