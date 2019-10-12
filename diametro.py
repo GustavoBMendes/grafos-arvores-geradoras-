@@ -1,4 +1,3 @@
-from random import choice
 grafo_nao_orientado = dict()
 
 def adiciona_vertice(vertice):
@@ -25,16 +24,6 @@ def adiciona_aresta(origem, destino):
 
     else:
         return False
-
-def remove_vertice(vertice):
-	if vertice in grafo_nao_orientado.keys():
-		del grafo_nao_orientado[vertice]
-		for x in grafo_nao_orientado.keys():
-			if vertice in grafo_nao_orientado[x]:
-				grafo_nao_orientado[x].remove(vertice)
-		return True
-	else:
-		return False
 
 def busca_em_largura(vertice_inicio):
     cor, dist, pai, fila = dict(), dict(), dict(), list()
@@ -77,53 +66,3 @@ def print_grafo():
         print('adjacentes: ')
         for u in grafo_nao_orientado.get(v):
             print(u)
-
-def random_tree_random_walk(n):
-    visitado = dict()
-
-    #criar um grafo G com n vertices
-
-    for u in grafo_nao_orientado.keys():
-        visitado[u] = False
-
-    u = choice(grafo_nao_orientado.keys())
-    visitado[u] = True
-
-    while arestas < n-1:
-        v = choice(grafo_nao_orientado.keys())
-        if not visitado[v]:
-            #adicionar (u,v) em G.E
-            visitado[v] = True
-        
-        u = v
-
-    #retornar grafo G
-'''
-def dfs():
-    cor, tempo_inicio, tempo_fim, pai = dict(), dict(), dict(), dict()
-
-    for u in grafo_nao_orientado.keys():
-        cor[u] = 'BRANCO'
-        pai[u] = None
-
-    tempo = 0
-
-    for u in grafo_nao_orientado.keys():
-        if cor[u] == 'BRANCO':
-            dfs-visit(u, tempo)
-
-def dfs-visit(vertice, tempo):
-    cor, tempo_inicio, tempo_fim = dict(), dict(), dict()
-
-    tempo++
-    cor[vertice] = 'CINZA'
-    tempo_inicio[vertice] = tempo
-
-    for v in grafo_nao_orientado.get(vertice):
-        if cor[v] == 'BRANCO':
-            dfs-visit(v)
-
-    cor[vertice] = 'PRETO'
-    tempo++
-    tempo_fim[vertice] = tempo
-'''
