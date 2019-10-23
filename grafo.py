@@ -1,117 +1,115 @@
 import random
-grafo_nao_orientado = dict()
 
-################ FUNCOES AUXILIARES ################
+class grafo:
 
-def adiciona_vertice(vertice):
-    if vertice not in grafo_nao_orientado.keys():
-        grafo_nao_orientado[vertice] = list()
-        return True
-    else:
-        return False
+    def __init__(self):
+        self.arestas = []
+        self.vertices = dict()
+        self.visitado = []
+        self.cor = []
+        self.dist = dict()
+        self.pai = dict()
 
-def adiciona_aresta(origem, destino):
+    def adiciona_vertice(self, vertice):
+        if vertice not in self.vertices.keys():
+            self.vertices[vertice] = list()
+            return True
+        else:
+            return False
 
-    if (origem and destino) in grafo_nao_orientado.keys() and destino not in grafo_nao_orientado[origem] and origem not in grafo_nao_orientado[destino] and destino != origem:
+    def adiciona_aresta(self, origem, destino):
 
-        grafo_nao_orientado[origem].append(destino)
-        grafo_nao_orientado[destino].append(origem)
+        if (origem and destino) in self.vertices.keys() and (origem,destino) not in self.arestas and (destino,origem) not in self.arestas and destino != origem:
+            self.vertices[origem].append(destino)
+            self.vertices[destino].append(origem)
+            return True
 
-        return True
+        else:
+            return False
 
-    else:
-        return False
+    def print_grafo(self):
+        print('Vertices:')
+        for v in self.vertices.keys():
+            print(v)
+            print('Arestas')
+            for u in self.vertices.get(v):
+                print(u)
 
-def remove_vertice(vertice):
-	if vertice in grafo_nao_orientado.keys():
-		del grafo_nao_orientado[vertice]
-		for x in grafo_nao_orientado.keys():
-			if vertice in grafo_nao_orientado[x]:
-				grafo_nao_orientado[x].remove(vertice)
-		return True
-	else:
-		return False
+    def limpa_grafo(self):
+        for x in grafo.vertices.keys():
+            del self.vertices[x]
+        for y in grafo.arestas:
+            del self.arestas[y]
 
-def print_grafo():
-    for v in grafo_nao_orientado.keys():
-        print('vertice {}'.format(v))
-        print('adjacentes: ')
-        for u in grafo_nao_orientado.get(v):
-            print(u)
-
-################ FUNCOES GRAFO ################
-
-def busca_em_largura(vertice_inicio):
-    cor = dict()    #CORES BRANCO = 1, CINZA = 2, PRETO = 3
-    dist = dict() 
-    pai = dict()
-    fila = list()
-
-    for v in grafo_nao_orientado.keys():
-        cor[v] = 1  #BRANCO
+def random_tree_random_walk(n):
     
-    fila.append(vertice_inicio)
-    cor[vertice_inicio] = 2     #CINZA
-    pai[vertice_inicio] = None
-    dist[vertice_inicio] = 0
+    g = grafo()
 
+    #criar um grafo G com n vertices
+    for i in range(n):
+        g.adiciona_vertice(i)
+
+    for u in g.vertices:
+        g.visitado.append(False)
+
+    u = random.choice(g.vertices.keys())
+    g.visitado[u-1] = True
+
+    while len(g.arestas) < n-1:
+        v = random.choice(g.vertices.keys())
+        if not g.visitado[v-1]:
+            g.arestas.append([u, v])
+            g.adiciona_aresta(u, v)
+            g.visitado[v-1] = True
+        u = v
+
+    if eh_arvore(g) == True:
+        return g
+    else:
+        return False
+
+def eh_arvore(grafo):
+    if len(grafo.arestas) != len(grafo.vertices.keys())-1:
+        return False
+    s = random.choice(grafo.vertices.keys())
+    maior, grafo.dist, grafo.cor = busca_em_largura(grafo, s)
+
+    for v in grafo.vertices.keys():
+        if grafo.cor[v-1] == 1: #BRANCO
+            return False
+    return True
+
+
+def diametro(g, vertice):
+    a, distancia, cor = busca_em_largura(g, vertice)
+    b, distancia, cor = busca_em_largura(g, a)
+    return distancia
+
+def busca_em_largura(g, vertice_inicio):
+    fila = list()
+    g.cor = []
+    dist = dict()
+    #CORES: 1 = BRANCO, 2 = CINZA, 3 = PRETO
+    for v in g.vertices.keys():
+        g.cor.append(1)
+
+    fila.append(vertice_inicio)
+    g.cor[vertice_inicio] = 2
+    g.pai[vertice_inicio] = None
+    dist[vertice_inicio] = 0
     u = -1
 
     while len(fila):
         u = fila[0]
         del fila[0]
-        for v in grafo_nao_orientado.get(u):
-
-            if cor.get(v) == 1:
-                cor[v] = 2
+        for v in g.vertices.get(u):
+            if g.cor[v] == 1:
+                g.cor[v] = 2
                 dist[v] = dist[u] + 1
-                pai[v] = u
+                g.pai[v] = u
                 fila.append(v)
 
-        cor[u] = 3
+        g.cor[u] = 3
+    g.cor[vertice_inicio-1] = 3
         
-    return u, dist[u], cor
-
-def diametro(vertice):
-    a, distancia, cor = busca_em_largura(vertice)
-    b, distancia, cor = busca_em_largura(a)
-    return distancia
-
-def random_tree_random_walk(n):
-    i = 1
-    visitado = dict()
-    arestas = []
-
-    #criar um grafo G com n vertices
-    for i in range(n):
-        adiciona_vertice(i)
-
-    for u in grafo_nao_orientado.keys():
-        visitado[u] = False
-
-    u = random.choice(grafo_nao_orientado.keys())
-    visitado[u] = True
-
-    while len(arestas) < n-1:
-        v = random.choice(grafo_nao_orientado.keys())
-        if not visitado[v]:
-            arestas.append([u, v])
-            adiciona_aresta(u, v)
-            visitado[v] = True
-        
-        u = v
-    if eh_arvore(arestas) == True:
-        return grafo_nao_orientado
-    else:
-        return False
-
-def eh_arvore(arestas):
-    if len(arestas) != len(grafo_nao_orientado.keys()) - 1:
-        return False
-    s = random.choice(grafo_nao_orientado.keys())
-    maior, dist, cor = busca_em_largura(s)
-
-    for v in grafo_nao_orientado.keys():
-        if cor.get(v) == 1:
-            return False
-    return True
+    return u, dist[u], g.cor

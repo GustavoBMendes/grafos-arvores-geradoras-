@@ -44,12 +44,11 @@ def main():
         somador = 0
         print('Gerando arvores com tamanho {}'.format(n))
         for i in range(500):
+            grafo = g.grafo()
             grafo = g.random_tree_random_walk(n)
-            s = random.choice(grafo.keys())
-            diametro = g.diametro(s)
+            s = random.choice(grafo.vertices.keys())
+            diametro = g.diametro(grafo, s)
             somador += diametro
-            for v in grafo.keys():
-                g.remove_vertice(v)
         media = somador/500
         arquivo.write(str(n) + ' ' + str(media) + '\n')
         print('{} {}'.format(n, media))
