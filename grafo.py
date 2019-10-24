@@ -20,8 +20,11 @@ class grafo:
     def adiciona_aresta(self, origem, destino):
 
         if (origem and destino) in self.vertices.keys() and (origem,destino) not in self.arestas and (destino,origem) not in self.arestas and destino != origem:
+            #preencher lista de adjacencia
             self.vertices[origem].append(destino)
             self.vertices[destino].append(origem)
+            #inicia com peso zero
+            self.arestas.append([origem,destino,0]) 
             return True
 
         else:
@@ -113,3 +116,30 @@ def busca_em_largura(g, vertice_inicio):
     g.cor[vertice_inicio-1] = 3
         
     return u, dist[u], g.cor
+
+def random_tree_kruskal(n):
+    g = grafo()
+
+    #criar um grafo G com n vertices
+    for i in range(n):
+        g.adiciona_vertice(i)
+
+    while len(grafo.arestas) < n:
+        origem = random.randint(0,n-1)
+        destino = random.randint(0,n-1)
+        grafo.adiciona_aresta(origem,destino)
+
+    for aresta in grafo.arestas:
+        aresta[2] = random.randint(0,1)
+
+    #mst_kruskal(grafo)
+    #return arvore kruskal
+
+'''
+random-tree-kruskal(n):
+1 crie um grafo completo G com n vértices
+2 for (u, v) in G.E
+3     (u, v).w = valor aleatório entre 0 e 1
+4 MST-Kruskal(G, w)
+5 return a árvore produzida por MST-Kruskal
+'''
