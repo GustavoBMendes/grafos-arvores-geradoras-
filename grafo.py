@@ -80,7 +80,8 @@ def eh_arvore(grafo):
     return True
 
 
-def diametro(g, vertice):
+def diametro(g):
+    vertice = random.choice(g.vertices.keys())
     a, distancia, cor = busca_em_largura(g, vertice)
     b, distancia, cor = busca_em_largura(g, a)
     return distancia

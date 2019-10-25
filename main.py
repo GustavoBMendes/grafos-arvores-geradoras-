@@ -46,8 +46,7 @@ def main():
         for i in range(500):
             grafo = g.grafo()
             grafo = g.random_tree_random_walk(n)
-            s = random.choice(grafo.vertices.keys())
-            diametro = g.diametro(grafo, s)
+            diametro = g.diametro(grafo)
             somador += diametro
         media = somador/500
         arquivo.write(str(n) + ' ' + str(media) + '\n')
