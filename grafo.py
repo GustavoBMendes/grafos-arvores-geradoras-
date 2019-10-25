@@ -20,11 +20,8 @@ class grafo:
     def adiciona_aresta(self, origem, destino):
 
         if (origem and destino) in self.vertices.keys() and (origem,destino) not in self.arestas and (destino,origem) not in self.arestas and destino != origem:
-            #preencher lista de adjacencia
             self.vertices[origem].append(destino)
             self.vertices[destino].append(origem)
-            #inicia com peso zero
-            self.arestas.append([origem,destino,0]) 
             return True
 
         else:
@@ -138,9 +135,9 @@ def random_tree_kruskal(n):
 
 '''
 random-tree-kruskal(n):
-1 crie um grafo completo G com n vértices
+1 crie um grafo completo G com n vertices
 2 for (u, v) in G.E
-3     (u, v).w = valor aleatório entre 0 e 1
+3     (u, v).w = valor aleatorio entre 0 e 1
 4 MST-Kruskal(G, w)
-5 return a árvore produzida por MST-Kruskal
+5 return a arvore produzida por MST-Kruskal
 '''

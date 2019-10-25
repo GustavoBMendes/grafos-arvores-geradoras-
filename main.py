@@ -18,25 +18,19 @@ def main():
     g.adiciona_aresta(2,5)
     g.adiciona_aresta(2,3)
     g.adiciona_aresta(3,4)
-
     g.print_grafo()
-
     maior, dist, cor = g.busca_em_largura(4)
     print('Vertice com a maior distancia = {}'.format(maior));
     test_bfs(maior, 8)
     
     distancia = g.diametro(1)
     test_diametro(distancia, 4)
-
     for v in g.grafo_nao_orientado.keys():
         g.remove_vertice(v)
-
     print('removido')
     g.print_grafo()
-
     tree = g.random_tree_random_walk(10)
     test_random_walk(tree, g.grafo_nao_orientado)
-
     '''
     tamanho = [250,500,750,1000,1250,1500,1750,2000]
     arquivo = open("diametros.txt", "w")
