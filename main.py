@@ -1,5 +1,6 @@
 import grafo as g
 import random
+import sys
 
 def main():
     '''
@@ -32,22 +33,46 @@ def main():
     tree = g.random_tree_random_walk(10)
     test_random_walk(tree, g.grafo_nao_orientado)
     '''
+    alg = sys.argv[1]
     tamanho = [250,500,750,1000,1250,1500,1750,2000]
     arquivo = open("diametros.txt", "w")
-    for n in tamanho:
-        somador = 0
-        print('Gerando arvores com tamanho {}'.format(n))
-        for i in range(500):
-            grafo = g.grafo()
-            grafo = g.random_tree_random_walk(n)
-            diametro = g.diametro(grafo)
-            somador += diametro
-        media = somador/500
-        arquivo.write(str(n) + ' ' + str(media) + '\n')
-        print('{} {}'.format(n, media))
+    if alg == 'randomwalk':
+        for n in tamanho:
+            somador = 0
+            print('Gerando arvores com tamanho {}'.format(n))
+            for i in range(500):
+                grafo = g.grafo()
+                grafo = g.random_tree_random_walk(n)
+                test_random_walk(grafo, False)
+                diametro = g.diametro(grafo)
+                somador += diametro
+            media = somador/500
+            arquivo.write(str(n) + ' ' + str(media) + '\n')
+            print('{} {}'.format(n, media))
 
-    arquivo.close()
+        arquivo.close()
 
+    elif alg == 'kruskal':
+        for n in tamanho:
+            somador = 0
+            print('Gerando arvores com tamanho {}'.format(n))
+            for i in range(500):
+                grafo = g.grafo()
+                grafo = g.random_tree_kruskal(n)
+                test_random_kruskal(grafo, False)
+                diametro = g.diametro(grafo)
+                somador += diametro
+            media = somador/500
+            arquivo.write(str(n) + ' ' + str(media) + '\n')
+            print('{} {}'.format(n, media))
+
+        arquivo.close()
+
+    else:
+        print('Nome incorreto do algoritmo')
+    
+    grafo = g.random_tree_kruskal(250)
+    test_random_kruskal(grafo, False)
 #recebe o diametro da arvore e testa se esta correto
 def test_diametro(got, expected):
 
@@ -70,13 +95,22 @@ def test_bfs(got, expected):
 
 
 #recebe o grafo da arvore e testa se esta correto
-def test_random_walk(got, expected):
+def test_random_walk(got, erro):
 
-    expressao = got == expected
-    mensagem = "Grafo nao correspondente!"
+    expressao = got != erro
+    mensagem = "Nao foi gerada uma arvore!"
 
     assert expressao, mensagem
     prefix = ' OK '
-    print("%s got 'random tree': %s expected: %s" % (prefix, repr(got), repr(expected)))
+    #print("%s got 'random tree': %s erro: %s" % (prefix, repr(got), repr(erro)))
+
+#recebe o grafo da arvore e testa se esta correto
+def test_random_kruskal(got, erro):
+
+    expressao = got != erro
+    mensagem = "Nao foi gerada uma arvore!"
+
+    assert expressao, mensagem
+    prefix = ' OK '
 
 main()
