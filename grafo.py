@@ -1,3 +1,4 @@
+from collections import deque
 import random
 
 class grafo:
@@ -7,6 +8,7 @@ class grafo:
         self.vertices = dict()
         self.visitado = []
         self.cor = []
+        self.chave = []
         self.dist = dict()
         self.pai = dict()
 
@@ -17,12 +19,12 @@ class grafo:
         else:
             return False
 
-    def adiciona_aresta(self, origem, destino):
+    def adiciona_aresta(self, aresta):
 
-        if (origem and destino) in self.vertices.keys() and destino not in self.vertices[origem] and origem not in self.vertices[destino] and destino != origem:
-            self.vertices[origem].append(destino)
-            self.vertices[destino].append(origem)
-            self.arestas.append([origem,destino,0]) #inicia aresta com peso 0
+        if aresta.destino not in self.vertices[aresta.origem] and aresta.origem not in self.vertices[aresta.destino] and aresta.destino != aresta.origem:
+            self.vertices[aresta.origem].append(aresta.destino)
+            self.vertices[aresta.destino].append(aresta.origem)
+            self.arestas.append(aresta) 
             return True
 
         else:
@@ -37,12 +39,11 @@ class grafo:
             for u in self.vertices.get(v):
                 print(u)
 
-    def limpa_grafo(self):
-        for x in self.vertices.keys():
-            del self.vertices[x]
-        for y in self.arestas:
-            del self.arestas[y]
-
+class Aresta:
+    def __init__(self,u,v):
+        self.origem = u
+        self.destino = v
+        self.w = -1
 
 class union_find:
 
@@ -86,7 +87,7 @@ def random_tree_random_walk(n):
     while len(g.arestas) < n-1:
         v = random.choice(g.vertices.keys())
         if not g.visitado[v-1]:
-            g.adiciona_aresta(u, v)
+            g.adiciona_aresta(Aresta(u, v))
             g.visitado[v-1] = True
         u = v
 
@@ -96,7 +97,8 @@ def random_tree_random_walk(n):
         return False
 
 def eh_arvore(grafo):
-    if len(grafo.arestas) != len(grafo.vertices.keys())-1:
+    tam = len(grafo.arestas)
+    if tam != len(grafo.vertices.keys())-1:
         return False
     s = random.choice(grafo.vertices.keys())
     maior, grafo.dist, grafo.cor = busca_em_largura(grafo, s)
@@ -114,13 +116,13 @@ def diametro(g):
     return distancia
 
 def busca_em_largura(g, vertice_inicio):
-    fila = list()
     g.cor = []
     dist = dict()
     #CORES: 1 = BRANCO, 2 = CINZA, 3 = PRETO
     for v in g.vertices.keys():
         g.cor.append(1)
 
+    fila = deque([])
     fila.append(vertice_inicio)
     g.cor[vertice_inicio] = 2
     g.pai[vertice_inicio] = None
@@ -128,8 +130,7 @@ def busca_em_largura(g, vertice_inicio):
     u = -1
 
     while len(fila):
-        u = fila[0]
-        del fila[0]
+        u = fila.popleft()
         for v in g.vertices.get(u):
             if g.cor[v] == 1:
                 g.cor[v] = 2
@@ -145,7 +146,7 @@ def busca_em_largura(g, vertice_inicio):
 def random_tree_kruskal(n):
     g = grafo()
 
-    #criar um grafo G com n vertices
+    #criar um grafo completo G com n vertices
     for i in range(n):
         g.adiciona_vertice(i)
 
@@ -153,10 +154,10 @@ def random_tree_kruskal(n):
         while len(g.vertices[u]) < len(g.vertices)-1:
             origem = random.randint(0,n-1)
             destino = random.randint(0,n-1)
-            g.adiciona_aresta(origem,destino)
+            g.adiciona_aresta(Aresta(origem,destino))
 
     for aresta in g.arestas:
-        aresta[2] = random.randint(0,1) #aresta(origem,destino,peso)[]
+        aresta.w = random.randint(0,1) #aresta(origem,destino,peso)[]
     
     a = mst_kruskal(g)
     if eh_arvore(a) == True:
@@ -169,15 +170,60 @@ def mst_kruskal(g):
     uf = union_find()
     for v in g.vertices.keys():
         uf.make_set(v)
+        a.adiciona_vertice(v)
     #ordenar arestas de forma crescente pelo peso
     g.arestas.sort(key = sortPeso)
     for aresta in g.arestas:
-        if uf.find_set(aresta[0]) != uf.find_set(aresta[1]):
-            a.adiciona_vertice(aresta[0])
-            a.adiciona_vertice(aresta[1])
-            a.adiciona_aresta(aresta[0], aresta[1])
-            uf.union(aresta[0], aresta[1])
+        if uf.find_set(aresta.origem) != uf.find_set(aresta.destino):
+            a.adiciona_aresta(aresta)
+            uf.union(aresta.origem, aresta.destino) 
     return a
 
 def sortPeso(val):
-    return val[2]
+    return val.w
+
+def random_tree_prim(n):
+    g = grafo()
+
+    #criar um grafo completo G com n vertices
+    for i in range(n):
+        g.adiciona_vertice(i)
+
+    for u in g.vertices.keys():
+        while len(g.vertices[u]) < len(g.vertices)-1:
+            origem = random.randint(0,n-1)
+            destino = random.randint(0,n-1)
+            g.adiciona_aresta(Aresta(origem,destino))
+
+    for aresta in g.arestas:
+        aresta.w = random.randint(0,1) #aresta(origem,destino,peso)[]
+
+    s = random.randint(0,n-1)
+    return mst_prim(g, s)
+
+def mst_prim(g, s):
+    for u in g.vertices:
+        g.chave.append(-1)
+        g.pai[u] = None
+
+    g.chave[s] = 0
+    q = g.vertices.copy()
+
+    while len(q) != 0:
+        u = min(q)
+        
+        for v in g.vertices.get(u):
+            peso = get_peso(g.arestas, u, v)
+            if v in q and peso < g.chave[v]:
+                g.pai[v] = u
+                g.chave[v] = peso
+
+    return g
+
+def get_peso(arestas, u, v):
+    for i in arestas:
+        print(i.origem)
+        print(i.destino)
+        if i.origem == u and i.destino == v:
+            return i.w
+    print('Aresta nao encontrada')

@@ -68,11 +68,12 @@ def main():
 
         arquivo.close()
 
-    else:
-        print('Nome incorreto do algoritmo')
+    #else:
+    #    print('Nome incorreto do algoritmo')
     
-    grafo = g.random_tree_kruskal(250)
+    grafo = g.random_tree_prim(250)
     test_random_kruskal(grafo, False)
+
 #recebe o diametro da arvore e testa se esta correto
 def test_diametro(got, expected):
 
