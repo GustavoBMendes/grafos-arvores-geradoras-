@@ -1,16 +1,16 @@
 from collections import deque
 import random
 
+#constantes
+branco = "BRANCO"
+cinza = "CINZA"
+preto = "PRETO"
+
 class grafo:
 
     def __init__(self):
         self.arestas = []
         self.vertices = dict()
-        self.visitado = []
-        self.cor = []
-        self.chave = []
-        self.dist = dict()
-        self.pai = dict()
 
     def adiciona_vertice(self, vertice):
         if vertice not in self.vertices.keys():
@@ -73,22 +73,23 @@ class union_find:
 
 def random_tree_random_walk(n):    
     g = grafo()
+    visitado = []
 
     #criar um grafo G com n vertices
     for i in range(n):
         g.adiciona_vertice(i)
 
     for u in g.vertices:
-        g.visitado.append(False)
+        visitado.append(False)
 
-    u = random.choice(g.vertices.keys())
-    g.visitado[u-1] = True
+    u = random.randint(0, n-1)
+    visitado[u] = True
 
     while len(g.arestas) < n-1:
         v = random.choice(g.vertices.keys())
-        if not g.visitado[v-1]:
+        if not visitado[v]:
             g.adiciona_aresta(Aresta(u, v))
-            g.visitado[v-1] = True
+            visitado[v] = True
         u = v
 
     if eh_arvore(g) == True:
@@ -97,14 +98,15 @@ def random_tree_random_walk(n):
         return False
 
 def eh_arvore(grafo):
+    cor = []
     tam = len(grafo.arestas)
     if tam != len(grafo.vertices.keys())-1:
         return False
-    s = random.choice(grafo.vertices.keys())
-    maior, grafo.dist, grafo.cor = busca_em_largura(grafo, s)
+    s = random.randint(0,len(grafo.vertices.keys())-1)
+    maior, dist, cor = busca_em_largura(grafo, s)
 
     for v in grafo.vertices.keys():
-        if grafo.cor[v-1] == 1: #BRANCO
+        if cor[v] == branco: 
             return False
     return True
 
@@ -116,32 +118,33 @@ def diametro(g):
     return distancia
 
 def busca_em_largura(g, vertice_inicio):
-    g.cor = []
+    cor = []
     dist = dict()
-    #CORES: 1 = BRANCO, 2 = CINZA, 3 = PRETO
+    pai = dict()
+    
     for v in g.vertices.keys():
-        g.cor.append(1)
+        cor.append(branco)
 
     fila = deque([])
     fila.append(vertice_inicio)
-    g.cor[vertice_inicio] = 2
-    g.pai[vertice_inicio] = None
+    cor[vertice_inicio] = cinza
+    pai[vertice_inicio] = None
     dist[vertice_inicio] = 0
     u = -1
 
     while len(fila):
         u = fila.popleft()
         for v in g.vertices.get(u):
-            if g.cor[v] == 1:
-                g.cor[v] = 2
+            if cor[v] == branco:
+                cor[v] = cinza
                 dist[v] = dist[u] + 1
-                g.pai[v] = u
+                pai[v] = u
                 fila.append(v)
 
-        g.cor[u] = 3
-    g.cor[vertice_inicio-1] = 3
+        cor[u] = preto
+    cor[vertice_inicio-1] = preto
         
-    return u, dist[u], g.cor
+    return u, dist[u], cor
 
 def random_tree_kruskal(n):
     g = grafo()
@@ -202,28 +205,30 @@ def random_tree_prim(n):
     return mst_prim(g, s)
 
 def mst_prim(g, s):
-    for u in g.vertices:
-        g.chave.append(-1)
-        g.pai[u] = None
+    pai = dict()
+    chave = []
 
-    g.chave[s] = 0
+    for u in g.vertices:
+        chave.append(-1)
+        pai[u] = None
+
+    chave[s] = 0
     q = g.vertices.copy()
 
-    while len(q) != 0:
+    while len(q) > 0:
         u = min(q)
-        
+        del q[u]
+        print(len(q))
         for v in g.vertices.get(u):
             peso = get_peso(g.arestas, u, v)
-            if v in q and peso < g.chave[v]:
-                g.pai[v] = u
-                g.chave[v] = peso
+            if v in q and peso < chave[v]:
+                pai[v] = u
+                chave[v] = peso
 
     return g
 
 def get_peso(arestas, u, v):
     for i in arestas:
-        print(i.origem)
-        print(i.destino)
-        if i.origem == u and i.destino == v:
+        if (i.origem == u and i.destino == v) or (i.origem == v and i.destino == u):
             return i.w
     print('Aresta nao encontrada')
