@@ -49,6 +49,8 @@ class union_find:
 
     def __init__(self):
         self.unionfind = dict()
+        self.pai = 0
+        self.rank = 1 
 
     def make_set(self, x):
         self.unionfind[x] = list()
@@ -59,17 +61,17 @@ class union_find:
         self.link(self.find_set(x), self.find_set(y))
 
     def link(self, x, y):
-        if self.unionfind[x][1] > self.unionfind[y][1]:
-            self.unionfind[y][0] = x
+        if self.unionfind[x][self.rank] > self.unionfind[y][self.rank]:
+            self.unionfind[y][self.pai] = x
         else:
-            self.unionfind[x][0] = y
-            if self.unionfind[x][1] == self.unionfind[y][1]:
-                self.unionfind[y][1] = self.unionfind[y][1] + 1
+            self.unionfind[x][self.pai] = y
+            if self.unionfind[x][self.rank] == self.unionfind[y][self.rank]:
+                self.unionfind[y][self.rank] = self.unionfind[y][self.rank] + 1
 
     def find_set(self, x):
-        if self.unionfind[x][0] != x:
-            self.unionfind[x][0] = self.find_set(self.unionfind[x][0])
-        return self.unionfind[x][0]
+        if self.unionfind[x][self.pai] != x:
+            self.unionfind[x][self.pai] = self.find_set(self.unionfind[x][self.pai])
+        return self.unionfind[x][self.pai]
 
 def random_tree_random_walk(n):    
     g = grafo()
@@ -86,7 +88,7 @@ def random_tree_random_walk(n):
     visitado[u] = True
 
     while len(g.arestas) < n-1:
-        v = random.choice(g.vertices.keys())
+        v = random.randint(0, n-1)
         if not visitado[v]:
             g.adiciona_aresta(Aresta(u, v))
             visitado[v] = True
@@ -160,7 +162,7 @@ def random_tree_kruskal(n):
             g.adiciona_aresta(Aresta(origem,destino))
 
     for aresta in g.arestas:
-        aresta.w = random.randint(0,1) #aresta(origem,destino,peso)[]
+        aresta.w = random.random() 
     
     a = mst_kruskal(g)
     if eh_arvore(a) == True:
