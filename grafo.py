@@ -6,11 +6,14 @@ branco = "BRANCO"
 cinza = "CINZA"
 preto = "PRETO"
 
+inf = 99999
+
 class grafo:
 
     def __init__(self):
         self.arestas = []
         self.vertices = dict()
+        self.chave = []
 
     def adiciona_vertice(self, vertice):
         if vertice not in self.vertices.keys():
@@ -21,7 +24,7 @@ class grafo:
 
     def adiciona_aresta(self, aresta):
 
-        if aresta.destino not in self.vertices[aresta.origem] and aresta.origem not in self.vertices[aresta.destino] and aresta.destino != aresta.origem:
+        if aresta.destino != aresta.origem:
             self.vertices[aresta.origem].append(aresta.destino)
             self.vertices[aresta.destino].append(aresta.origem)
             self.arestas.append(aresta) 
@@ -40,6 +43,7 @@ class grafo:
                 print(u)
 
 class Aresta:
+
     def __init__(self,u,v):
         self.origem = u
         self.destino = v
@@ -156,10 +160,8 @@ def random_tree_kruskal(n):
         g.adiciona_vertice(i)
 
     for u in g.vertices.keys():
-        while len(g.vertices[u]) < len(g.vertices)-1:
-            origem = random.randint(0,n-1)
-            destino = random.randint(0,n-1)
-            g.adiciona_aresta(Aresta(origem,destino))
+        for v in g.vertices.keys():
+            g.adiciona_aresta(Aresta(u,v))
 
     for aresta in g.arestas:
         aresta.w = random.random() 
@@ -189,45 +191,48 @@ def sortPeso(val):
 
 def random_tree_prim(n):
     g = grafo()
+    arexta = dict()
 
     #criar um grafo completo G com n vertices
     for i in range(n):
         g.adiciona_vertice(i)
 
     for u in g.vertices.keys():
-        while len(g.vertices[u]) < len(g.vertices)-1:
-            origem = random.randint(0,n-1)
-            destino = random.randint(0,n-1)
-            g.adiciona_aresta(Aresta(origem,destino))
+        for v in g.vertices.keys():
+            if g.adiciona_aresta(Aresta(u,v)):
+                arexta[(u,v)] = random.random()
 
-    for aresta in g.arestas:
-        aresta.w = random.randint(0,1) #aresta(origem,destino,peso)[]
+    #for aresta in g.arestas:
+        #aresta.w = random.random() 
 
     s = random.randint(0,n-1)
-    return mst_prim(g, s)
+    return mst_prim(g, s, arexta)
 
-def mst_prim(g, s):
+def mst_prim(g, s, arexta):
     pai = dict()
-    chave = []
 
     for u in g.vertices:
-        chave.append(-1)
+        g.chave.append(inf)
         pai[u] = None
 
-    chave[s] = 0
-    q = g.vertices.copy()
+    g.chave[s] = 0
+    q = g.chave
 
     while len(q) > 0:
-        u = min(q)
+        u = extract_min(q)
         del q[u]
-        print(len(q))
         for v in g.vertices.get(u):
-            peso = get_peso(g.arestas, u, v)
-            if v in q and peso < chave[v]:
+            peso = arexta.get((u,v))
+            if v in q and peso < q[v]:
                 pai[v] = u
-                chave[v] = peso
+                q[v] = peso
 
     return g
+
+def extract_min(chave):
+    x = min(chave)
+    u = chave.index(x)
+    return u
 
 def get_peso(arestas, u, v):
     for i in arestas:

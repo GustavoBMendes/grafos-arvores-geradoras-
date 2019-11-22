@@ -43,7 +43,7 @@ def main():
             for i in range(500):
                 grafo = g.grafo()
                 grafo = g.random_tree_random_walk(n)
-                test_random_walk(grafo, False)
+                #test_random_walk(grafo, False)
                 diametro = g.diametro(grafo)
                 somador += diametro
             media = somador/500
@@ -59,7 +59,7 @@ def main():
             for i in range(500):
                 grafo = g.grafo()
                 grafo = g.random_tree_kruskal(n)
-                test_random_kruskal(grafo, False)
+                #test_random_kruskal(grafo, False)
                 diametro = g.diametro(grafo)
                 somador += diametro
             media = somador/500
@@ -68,11 +68,27 @@ def main():
 
         arquivo.close()
 
-    #else:
-    #    print('Nome incorreto do algoritmo')
+    elif alg == 'prim':
+        for n in tamanho:
+            somador = 0
+            print('Gerando arvores com tamanho {}'.format(n))
+            for i in range(500):
+                grafo = g.grafo()
+                grafo = g.random_tree_prim(n)
+                #test_random_prim(grafo, False)
+                diametro = g.diametro(grafo)
+                somador += diametro
+            media = somador/500
+            arquivo.write(str(n) + ' ' + str(media) + '\n')
+            print('{} {}'.format(n, media))
+
+        arquivo.close()
+
+    else:
+        print('Nome incorreto do algoritmo')
+        g.random_tree_prim(250)
+
     
-    grafo = g.random_tree_prim(250)
-    test_random_kruskal(grafo, False)
 
 #recebe o diametro da arvore e testa se esta correto
 def test_diametro(got, expected):
