@@ -13,7 +13,7 @@ class grafo:
     def __init__(self):
         self.arestas = []
         self.vertices = dict()
-        self.chave = []
+        self.chave = dict()
 
     def adiciona_vertice(self, vertice):
         if vertice not in self.vertices.keys():
@@ -35,8 +35,9 @@ class grafo:
  
 
     def print_grafo(self):
-        print('Vertices:')
+        
         for v in self.vertices.keys():
+            print('Vertice:')
             print(v)
             print('Arestas')
             for u in self.vertices.get(v):
@@ -118,7 +119,7 @@ def eh_arvore(grafo):
 
 
 def diametro(g):
-    vertice = random.choice(g.vertices.keys())
+    vertice = g.vertices.keys()[0]
     a, distancia, cor = busca_em_largura(g, vertice)
     b, distancia, cor = busca_em_largura(g, a)
     return distancia
@@ -206,18 +207,22 @@ def random_tree_prim(n):
         #aresta.w = random.random() 
 
     s = random.randint(0,n-1)
-    return mst_prim(g, s, arexta)
+    a = mst_prim(g, s, arexta)
+    #if eh_arvore(a) == True:
+    return a
+    #else:
+    #    return False
 
 def mst_prim(g, s, arexta):
     pai = dict()
 
     for u in g.vertices:
-        g.chave.append(inf)
+        g.chave[u] = inf
         pai[u] = None
 
     g.chave[s] = 0
+    pai[s] = 0
     q = g.chave
-
     while len(q) > 0:
         u = extract_min(q)
         del q[u]
@@ -226,12 +231,21 @@ def mst_prim(g, s, arexta):
             if v in q and peso < q[v]:
                 pai[v] = u
                 q[v] = peso
-
-    return g
+                
+    g2 = grafo()
+    for i in g.vertices.keys():
+        g2.adiciona_vertice(i)
+    for x in pai.keys():
+        y = pai.get(x)
+        g2.adiciona_aresta(Aresta(x,y))
+            
+    return g2
 
 def extract_min(chave):
-    x = min(chave)
-    u = chave.index(x)
+    x = min(chave.values()) #menor valor das chaves
+    for i in chave.items(): #percorre a lista de tuplas(vertice, chave)
+        if x in i:
+            u = i[0]        #pega o vertice
     return u
 
 def get_peso(arestas, u, v):
